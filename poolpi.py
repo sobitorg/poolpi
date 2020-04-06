@@ -1,9 +1,16 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import os
 import glob
 import time
+import paho.mqtt.client as mqtt #import the client1
 from datetime import datetime
+
+broker_address="10.29.30.155" 
+#broker_address="iot.eclipse.org" #use external broker
+client = mqtt.Client("poolpi") #create new instance
+client.connect(broker_address) #connect to broker
+
 
 os.system('modprobe w1-gpio')
 os.system('modprobe w1-therm')
@@ -36,7 +43,7 @@ def read_temp():
 	
 while True:
 #	print(read_temp()) 	
-        temp=str(read_temp())+"\n"
+        temp=str(read_temp())
+        client.publish("poolpi", payload=temp, qos=0, retain=True)
         filetemp.write(temp)
-	time.sleep(10)
-	
+        time.sleep(10)
